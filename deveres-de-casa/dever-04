@@ -1,0 +1,29 @@
+import math
+
+def f_recursiva(n):
+    # Caso Base: F(1) = 2
+    if n == 1:
+        return 2
+    # Passo Recursivo: F(n) = 2*F(n-1) + n^2
+    else:
+        return 2 * f_recursiva(n - 1) + n**2
+
+def f_fechada(n):
+
+    return 9 * math.pow(2, n - 1) - math.pow(n, 2) - 2 * n - 3
+try:
+    n_input = int(input("Digite o valor de n: "))
+
+    if n_input < 1:
+        print("insira um número inteiro maior ou igual a 1.")
+    else:
+        resultado_rec = f_recursiva(n_input)
+        resultado_fechado = f_fechada(n_input)
+
+        print("-" * 30)
+        print(f"Resultado (Recursivo): {resultado_rec}")
+        print(f"Resultado (Fórmula Fechada): {int(resultado_fechado)}")
+        print("-" * 30)
+
+except ValueError:
+    print("Entrada inválida. Digite apenas números inteiros.")
