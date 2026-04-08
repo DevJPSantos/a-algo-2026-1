@@ -1,0 +1,73 @@
+import numpy as np
+import time
+import math
+
+# MERGE SORT 
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+# MULTIPLICAÇÃO DE MATRIZES
+def multiply_matrices(A, B):
+    n = len(A)
+    C = [[0 for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+# SIMULAÇÃO
+def solve_recurrence(n, a, b, extra_work_func):
+    if n <= 1:
+        return 1
+    return a * solve_recurrence(n // b, a, b, extra_work_func) + extra_work_func(n)
+
+# TESTES
+if __name__ == "__main__":
+    print("-" * 30)
+    print("MERGE SORT")
+    lista = [38, 27, 43, 3, 9, 82, 10]
+    print(f"Original: {lista}")
+    print(f"Ordenado: {merge_sort(lista)}")
+    
+    print("\n" + "-" * 30)
+    print("MULTIPLICAÇÃO DE MATRIZES")
+    size = 50
+    A = np.random.rand(size, size).tolist()
+    B = np.random.rand(size, size).tolist()
+    start = time.time()
+    multiply_matrices(A, B)
+    print(f"Tempo para matriz {size}x{size}: {time.time() - start:.4f}s")
+    
+    print("\n" + "-" * 30)
+    print("SIMULAÇÃO DE RECORRÊNCIAS")
+
+    res_a = solve_recurrence(1024, 2, 4, lambda n: math.sqrt(n))
+
+    res_b = solve_recurrence(1024, 2, 4, lambda n: n)
+
+    res_c = solve_recurrence(1024, 16, 4, lambda n: n**2)
+    
+    print(f"Recorrência A (O(√n log n)): {res_a:.2f}")
+    print(f"Recorrência B (O(n)):         {res_b}")
+    print(f"Recorrência C (O(n² log n)):  {res_c}")
+    print("-" * 30)
