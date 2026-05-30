@@ -1,0 +1,48 @@
+import pandas as pd
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# 1. Carregar o dataset Breast Cancer Wisconsin
+data = load_breast_cancer()
+X = data.data    # Features (características dos tumores)
+y = data.target  # Labels (0 = Maligno, 1 = Benigno)
+
+# 2. Separar os dados em treino e teste (80% treino, 20% teste)
+# O random_state=42 garante que a divisão seja a mesma sempre que rodar o código
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 3. Normalizar os dados
+# Isso é crucial! Padroniza as features para terem média 0 e variância 1.
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Configurações para os testes
+valores_k = [1, 3, 5]
+metricas = ['euclidean', 'manhattan']
+resultados = []
+
+print("=== RESULTADOS DA CLASSIFICAÇÃO K-NN ===\n")
+
+# 4 e 5. Treinar e Testar o K-NN variando K e a métrica de distância
+for metrica in metricas:
+    for k in valores_k:
+        # Inicializa o modelo K-NN
+        knn = KNeighborsClassifier(n_neighbors=k, metric=metrica)
+        
+        # Treina o modelo com os dados normalizados
+        knn.fit(X_train_scaled, y_train)
+        
+        # Faz as previsões usando a base de teste
+        y_pred = knn.predict(X_test_scaled)
+        
+        # Calcula a acurácia
+        acuracia = accuracy_score(y_test, y_pred)
+        resultados.append({'K': k, 'Metrica': metrica, 'Acuracia': acuracia})
+        
+        print(f"Métrica: {metrica.capitalize():<10} | K = {k} | Acurácia: {acuracia:.4f} ({acuracia*100:.2f}%)")
+
+print("\n------------------------------------------------")
