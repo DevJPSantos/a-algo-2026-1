@@ -1,0 +1,81 @@
+class Grafo:
+    def __init__(self, vertices):
+        self.V = vertices  # Número de vértices
+        self.grafo = []    # Lista de arestas
+
+    def adicionar_aresta(self, u, v, peso):
+        self.grafo.append([u, v, peso])
+
+    # SUAS FUNÇÕES INTACTAS AQUI:
+    def buscar_raiz(self, pai, i):
+        # Path Compression: aponta direto para a raiz
+        if pai[i] == i:
+            return i
+        pai[i] = self.buscar_raiz(pai, pai[i])
+        return pai[i]
+
+    def unir_redes(self, pai, rank, x, y):
+        # Union by Rank: rede maior absorve a menor
+        raiz_x = self.buscar_raiz(pai, x)
+        raiz_y = self.buscar_raiz(pai, y)
+
+        if rank[raiz_x] < rank[raiz_y]:
+            pai[raiz_x] = raiz_y
+        elif rank[raiz_x] > rank[raiz_y]:
+            pai[raiz_y] = raiz_x
+        else:
+            pai[raiz_y] = raiz_x
+            rank[raiz_x] += 1
+
+    # A FUNÇÃO PRINCIPAL MODIFICADA:
+    def kruskal_maximo(self):
+        resultado = []
+        i = 0  # Índice para percorrer as arestas ordenadas
+        e = 0  # Contador de arestas no resultado
+
+        # A GRANDE MUDANÇA ESTÁ AQUI:
+        # Ordenamos o grafo com base no peso de forma DECRESCENTE (reverse=True)
+        # Assim, o algoritmo sempre tenta pegar os cabos mais caros primeiro.
+        self.grafo = sorted(self.grafo, key=lambda item: item[2], reverse=True)
+
+        pai = []
+        rank = []
+
+        # Inicializa os pais e ranks
+        for node in range(self.V):
+            pai.append(node)
+            rank.append(0)
+
+        # Continua até termos V-1 arestas (condição para não ter ciclos em uma árvore)
+        while e < self.V - 1 and i < len(self.grafo):
+            u, v, peso = self.grafo[i]
+            i = i + 1
+
+            x = self.buscar_raiz(pai, u)
+            y = self.buscar_raiz(pai, v)
+
+            # Se a inclusão dessa aresta não formar um ciclo
+            if x != y:
+                e = e + 1
+                resultado.append([u, v, peso])
+                self.unir_redes(pai, rank, x, y)
+
+        custo_maximo = 0
+        print("=== ÁRVORE GERADORA MÁXIMA ===")
+        for u, v, peso in resultado:
+            custo_maximo += peso
+            print(f"Caminho de {u} para {v} -> Custo: {peso}")
+        print("-" * 30)
+        print(f"Custo Máximo Total: {custo_maximo}")
+
+# --- Testando o Código ---
+# Exemplo com 4 vértices (0 a 3)
+g = Grafo(4)
+g.adicionar_aresta(0, 1, 10)
+g.adicionar_aresta(0, 2, 6)
+g.adicionar_aresta(0, 3, 5)
+g.adicionar_aresta(1, 3, 15)
+g.adicionar_aresta(2, 3, 4)
+
+# Executa o algoritmo modificado
+g.kruskal_maximo()
