@@ -1,0 +1,57 @@
+import heapq
+
+def prim_mst(grafo, origem):
+    # Armazena a rota final (Árvore Geradora Mínima)
+    mst_rota = []
+    
+    # Conjunto para rastrear as cidades que já foram conectadas à rede
+    visitados = set([origem])
+    
+    # Fila de prioridade (Min-Heap) para escolher sempre o cabo mais curto disponível
+    # Formato: (distancia, cidade_origem, cidade_destino)
+    arestas = [
+        (distancia, origem, destino)
+        for destino, distancia in grafo[origem].items()
+    ]
+    heapq.heapify(arestas)
+    
+    custo_total = 0
+
+    while arestas:
+        # Pega a aresta com a menor distância
+        distancia, cidade_a, cidade_b = heapq.heappop(arestas)
+        
+        # Se a cidade destino ainda não tem conexão com a rede principal
+        if cidade_b not in visitados:
+            visitados.add(cidade_b)
+            mst_rota.append((cidade_a, cidade_b, distancia))
+            custo_total += distancia
+            
+            # Adiciona as novas possibilidades de caminho a partir da cidade recém-conectada
+            for proximo_destino, proxima_distancia in grafo[cidade_b].items():
+                if proximo_destino not in visitados:
+                    heapq.heappush(arestas, (proxima_distancia, cidade_b, proximo_destino))
+                    
+    return mst_rota, custo_total
+
+# Mapeando o grafo com base nas distâncias fornecidas no seu texto
+# Nota: D-E está como 3Km seguindo o seu texto (na imagem aparece 4, se precisar mudar, é só alterar o 'E': 3 para 'E': 4 aqui embaixo)
+grafo_cidades = {
+    'A': {'B': 4, 'C': 4},
+    'B': {'A': 4, 'C': 2, 'D': 5},
+    'C': {'A': 4, 'B': 2, 'D': 5, 'E': 6},
+    'D': {'B': 5, 'C': 5, 'E': 3, 'F': 4},
+    'E': {'C': 6, 'D': 3, 'F': 2},
+    'F': {'D': 4, 'E': 2}
+}
+
+# Executando o algoritmo a partir do polo 'A'
+rota_instalacao, quilometragem_total = prim_mst(grafo_cidades, 'A')
+
+# Imprimindo os resultados no terminal do Colab
+print("=== ROTA DE INSTALAÇÃO DOS CABOS (Algoritmo de Prim) ===")
+for origem, destino, km in rota_instalacao:
+    print(f"Instalar cabo de {origem} para {destino} -> {km} Km")
+
+print("-" * 50)
+print(f"QUANTIDADE TOTAL MÍNIMA DE CABOS: {quilometragem_total} Km")
